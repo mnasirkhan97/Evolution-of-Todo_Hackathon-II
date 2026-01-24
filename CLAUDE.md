@@ -1,18 +1,33 @@
-# CLAUDE.md - Developer Instructions
+# Todo App - Hackathon II (Phase II: Monorepo)
 
-## Build & Test
-- **Run App**: `python src/main.py` OR `uv run src/main.py`
-- **Install Dependencies**: `uv sync`
-- **Test**: `pytest` (if applicable)
+## Project Overview
+This is a monorepo using GitHub Spec-Kit for spec-driven development.
 
-## Project Architecture
-- **Phase I**: In-memory Python Console App.
-- **Structure**:
-  - `specs/`: Markdown specifications for features.
-  - `src/`: Python source code.
+## Spec-Kit Structure
+Specifications are organized in `/specs`:
+- `/specs/overview.md` - Project overview
+- `/specs/features/` - Feature specs (what to build)
+- `/specs/api/` - API endpoint and MCP tool specs
+- `/specs/database/` - Schema and model specs
+- `/specs/ui/` - Component and page specs
 
-## Coding Standards
-- **Spec-Driven**: Read the spec before writing code.
-- **Typing**: Use standard Python type hinting.
-- **Style**: Follow PEP 8.
-- **Documentation**: Docstrings for all functions and classes.
+## How to Use Specs
+1. Always read relevant spec before implementing.
+2. Reference specs with: `@specs/features/task-crud.md`.
+3. Update specs if requirements change.
+
+## Project Structure
+- `/frontend` - Next.js App (Web Interface)
+- `/backend` - FastAPI Server (API)
+- `src/` - Legacy Phase I code (Console App)
+
+## Development Workflow
+1. Read spec: `@specs/features/[feature].md`
+2. Implement backend: `@backend/CLAUDE.md`
+3. Implement frontend: `@frontend/CLAUDE.md`
+4. Test and iterate
+
+## Commands
+- **Frontend**: `cd frontend && npm run dev`
+- **Backend**: `cd backend && uvicorn main:app --reload`
+- **Both**: `docker-compose up` (Phase IV+)
