@@ -5,16 +5,23 @@ import os
 from typing import Optional
 
 # Security Scheme
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 # Configuration
 BETTER_AUTH_SECRET = os.environ.get("BETTER_AUTH_SECRET", "dev_secret_key")
 ALGORITHM = "HS256"
 
-def get_current_user_id(credentials: HTTPAuthorizationCredentials = Security(security)) -> str:
+def get_current_user_id(credentials: Optional[HTTPAuthorizationCredentials] = Security(security)) -> str:
     """
     Decodes the JWT token and returns the user_id.
     """
+    if not credentials:
+        print("DEBUG: No credentials provided in request header.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing authentication credentials",
+        )
+
     token = credentials.credentials
     print(f"DEBUG: Received token: {token[:10]}...") # Log start of token
     try:
