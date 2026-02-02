@@ -44,10 +44,17 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
   // Backend expects JWT. If Better Auth is configured with JWT, the session token might be available.
   // Note: Adjust 'token' access based on your specific Better Auth config.
   // Common pattern: Use session.token if available, else try session.id
+
+  // Debugging Frontend Session
+  console.log("DEBUG: Full Session Object:", session);
+
   const token = (session?.session as any)?.token || session?.session?.id;
+  console.log("DEBUG: Extracted Token:", token);
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  } else {
+    console.warn("DEBUG: No token found for Authorization header");
   }
 
 
