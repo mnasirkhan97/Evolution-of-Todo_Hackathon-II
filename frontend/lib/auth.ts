@@ -1,15 +1,5 @@
 import { betterAuth } from "better-auth";
-import { pg } from "better-auth/adapters/pg"; // Or appropriate adapter
-// To keep it simple and match "neon" requirement without full ORM in Next.js just for auth, 
-// we can use standard postgres adapter if we install 'pg'.
-// Or since we use SQLModel in backend, maybe we can share the db?
-// Better Auth needs its own tables. It auto-migrates.
-
-// For hackathon speed, we'll try to use the simplest setup.
-// backend uses sqlmodel (sqlite/postgres).
-// Setup for Next.js:
-// We need 'pg' package.
-
+import { pg } from "better-auth/adapters/pg";
 import { Pool } from "pg";
 
 const pool = new Pool({
@@ -18,29 +8,14 @@ const pool = new Pool({
 });
 
 export const auth = betterAuth({
-    database: new Pool({
-        connectionString: process.env.DATABASE_URL,
-        // Pass SSL options if needed, usually passed in connectionString or extra config
-    }),
-    // Wait, better-auth might need specific adapter config.
-    // Documentation says: 
-    // database: { provider: "postgres", url: process.env.DATABASE_URL } (if using built-in?)
-    // Let's use the generic config if possible or specific adapter.
-    // Ideally:
-    /*
-    database: {
-        url: process.env.DATABASE_URL,
-        type: "postgres"
-    }
-    */
-    // But checking imports... `better-auth` main export.
-
-    // Let's assume standard config for now.
+    database: pg(pool),
     emailAndPassword: {
         enabled: true,
     },
     secret: process.env.BETTER_AUTH_SECRET,
+    // Add trusted origins to prevent CORS issues with auth
+    trustedOrigins: ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000"],
     session: {
-        strategy: "jwt", // Crucial for backend verification!
+        strategy: "jwt",
     }
 });
