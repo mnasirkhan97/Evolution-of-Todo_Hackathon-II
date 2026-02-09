@@ -1,0 +1,49 @@
+# Plan: Phase V - Advanced Cloud Deployment
+
+## 1. System Architecture
+- **Microservices**:
+    - **Frontend Service**: Next.js App (Service Invocation -> Backend).
+    - **Backend Service**: FastAPI App + Dapr Sidecar (PubSub -> Kafka).
+    - **Notification Service**: New Python consumer service for sending reminders.
+    - **Audit Service**: New Python consumer service for logging.
+- **Infrastructure**:
+    - **Dapr**: Sidecars for each service.
+    - **Kafka**: Redpanda or Strimzi (Message Broker).
+    - **Postgres**: Neon DB (External DB).
+
+## 2. Component Design
+### 2.1 Backend (Updated)
+- **API**: Add `is_recurring`, `recurrence_interval`, `due_date` fields to `Task` model.
+- **Logic**: 
+    - When Task Created/Updated/Deleted: Publish event to `task-events` topic via Dapr PubSub.
+    - When Recurring Task Completed: Publish `task-completed` event.
+    - Scheduler: Use Dapr Bindings (Cron) or internal scheduler to trigger due date checks?
+        - *Decision*: Simple Cron Binding is better for "Cloud Native".
+
+### 2.2 Frontend (Updated)
+- **UI**: Add inputs for Due Date & Recurrence.
+- **Real-time**: Listen for updates? 
+    - *Decision*: For Phase V simplified scope, we might poll or skip WebSocket complexity unless time permits. Let's focus on Notification Service first.
+
+### 2.3 Notification Service (New)
+- **Role**: Subscribe to `task-events` and `reminders`.
+- **Logic**: Simply log "Sending email to User X" for now.
+
+### 2.4 Audit Service (New)
+- **Role**: Subscribe to `task-events`.
+- **Logic**: Write event to `AuditLog` table in DB.
+
+## 3. Interfaces & Events
+### 3.1 Topics
+- `task-events`: All CRUD operations.
+- `reminders`: Scheduled triggers.
+
+### 3.2 Event Schemas
+- **TaskEvent**: `{ "event_type": "created", "task_id": 1, "data": {...}, "timestamp": "..." }`
+- **ReminderEvent**: `{ "task_id": 1, "title": "Buy milk", "user_id": "user_123" }`
+
+## 4. Deployment Strategy
+- **Minikube**:
+    - `helm install bitnami/kafka` or `redpanda`.
+    - `dapr init -k`.
+    - Deploy apps with Dapr annotations.
