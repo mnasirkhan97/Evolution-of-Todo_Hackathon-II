@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+dapr-ext-fastapi
+cloudevents
+sqlmodel
+psycopg2-binary
