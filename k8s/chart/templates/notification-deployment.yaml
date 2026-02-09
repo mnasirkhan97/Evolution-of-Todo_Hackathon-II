@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "notification-service"
+        dapr.io/app-port: "6000"
+    spec:
+      containers:
+      - name: notification-service
+        image: {{ .Values.notification.image }}
+        ports:
+        - containerPort: 6000
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"

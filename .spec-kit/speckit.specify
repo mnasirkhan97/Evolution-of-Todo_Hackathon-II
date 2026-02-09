@@ -1,0 +1,32 @@
+# Specification: Phase V - Advanced Cloud Deployment
+
+## 1. User Journeys
+### 1.1 Recurring Tasks
+- **As a User**, I want to set a task to repeat daily, weekly, or monthly so that I don't have to recreate it manually.
+- **System**: When a recurring task is completed, strict event-driven logic creates the next instance automatically.
+
+### 1.2 Reminders & Notifications
+- **As a User**, I want to set a due date and receive a reminder notification.
+- **System**: When due date arrives, system pushes a notification (mocked or real) to the user.
+
+### 1.3 Audit Log
+- **As an Admin/User**, I want to see a history of all changes to my tasks.
+- **System**: Every create/update/delete/complete action is logged to an immutable audit trail via Kafka.
+
+### 1.4 Real-time Sync
+- **As a User**, when I update a task on my mobile, I want my desktop view to update immediately.
+- **System**: WebSocket or Server-Sent Events (SSE) triggered by Kafka events update frontend state.
+
+## 2. Global Requirements
+- **Event Bus**: All major state changes (TaskCreated, TaskCompleted, TaskUpdated, TaskDeleted) MUST be published to Kafka topics.
+- **Dapr Integration**: Use Dapr sidecars for:
+    - Pub/Sub (publishing/consuming Kafka events).
+    - State Management (if needed for conversation cache).
+    - Service Invocation (Frontend -> Backend).
+- **Deployment**:
+    - Local: Minikube with Dapr and Redpanda/Strimzi.
+    - Cloud: AKS/GKE/DigitalOcean with similar stack.
+
+## 3. Domain Model Extensions
+- **Task**: Add `is_recurring` (bool), `recurrence_interval` (str: daily, weekly), `due_date` (datetime), `next_occurrence` (datetime).
+- **AuditLog**: New model `id`, `entity_type`, `entity_id`, `action`, `user_id`, `timestamp`, `details` (json).

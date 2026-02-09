@@ -11,6 +11,9 @@ interface Task {
     title: string;
     description?: string;
     status: string;
+    is_recurring?: boolean;
+    recurrence_interval?: string;
+    due_date?: string;
 }
 
 interface TaskListProps {
@@ -88,6 +91,19 @@ export function TaskList({ refreshTrigger }: TaskListProps) {
                             {task.description && (
                                 <p className="text-gray-400 mt-1 text-sm">{task.description}</p>
                             )}
+
+                            <div className="flex gap-2 mt-2 text-xs">
+                                {task.is_recurring && (
+                                    <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                        ↻ {task.recurrence_interval}
+                                    </span>
+                                )}
+                                {task.due_date && (
+                                    <span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                        📅 {new Date(task.due_date).toLocaleDateString()}
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

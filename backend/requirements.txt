@@ -8,3 +8,4 @@ pyjwt
 passlib[bcrypt]
 openai
 mcp
+dapr-ext-fastapi

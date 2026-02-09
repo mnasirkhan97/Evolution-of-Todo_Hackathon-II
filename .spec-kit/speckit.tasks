@@ -1,0 +1,22 @@
+# Tasks: Phase V
+
+## Part A: Domain Logic & Database
+- [x] **T-501**: Update `Task` model in `backend/models.py` to include `is_recurring`, `recurrence_interval`, `due_date`. Run migration (or recreate DB). <!-- id: 100 -->
+- [x] **T-502**: Create `AuditLog` model in `backend/models.py`. <!-- id: 101 -->
+
+## Part B: Dapr Integration (Backend)
+- [x] **T-503**: Install Dapr Python SDK (`dapr-ext-fastapi` or just `dapr-python-sdk`). Update `requirements.txt`. <!-- id: 102 -->
+- [x] **T-504**: Implement Dapr PubSub publisher in `backend/main.py` (or service layer) handling `task-events`. Publish on create/update/delete. <!-- id: 103 -->
+
+## Part C: Consumer Services
+- [x] **T-505**: Create `notification-service/` directory with basic `main.py` Dapr subscriber. <!-- id: 104 -->
+- [x] **T-506**: Create `audit-service/` directory with basic `main.py` Dapr subscriber + DB write logic. <!-- id: 105 -->
+
+## Part D: Frontend Updates
+- [x] **T-507**: Update `TaskForm` component to accept Due Date and Recurrence. <!-- id: 106 -->
+- [x] **T-508**: Update `TaskList` to display these new fields. <!-- id: 107 -->
+
+## Part E: Deployment Configuration
+- [x] **T-509**: Create `k8s/dapr/components` (pubsub.yaml, statestore.yaml). <!-- id: 108 -->
+- [x] **T-510**: Update Helm Chart to include new services and Dapr annotations. <!-- id: 109 -->
+- [ ] **T-511**: Deploy everything to Minikube and Verify. <!-- id: 110 -->

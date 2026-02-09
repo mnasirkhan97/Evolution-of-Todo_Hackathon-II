@@ -8,6 +8,12 @@ backend:
     type: ClusterIP
     port: 8000
 
+notification:
+  image: notification-service:latest
+
+audit:
+  image: audit-service:latest
+
 frontend:
   replicaCount: 1
   image:

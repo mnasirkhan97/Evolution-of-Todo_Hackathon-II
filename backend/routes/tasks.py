@@ -2,12 +2,49 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from typing import List, Optional
 from datetime import datetime, timezone
+import json
 
 from db import get_session
 from models import Task, TaskCreate, TaskUpdate
 from auth import get_current_user_id
 
+# Dapr Import
+try:
+    from dapr.clients import DaprClient
+    DAPR_AVAILABLE = True
+except ImportError:
+    DAPR_AVAILABLE = False
+    print("Dapr SDK not installed/available. Skipping events.")
+
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
+
+PUBSUB_NAME = "kafka-pubsub"
+TOPIC_NAME = "task-events"
+
+def publish_task_event(event_type: str, task: Task):
+    """Publish task event to Dapr PubSub."""
+    if not DAPR_AVAILABLE:
+        return
+
+    try:
+        with DaprClient() as d:
+             # Serialize task manually or use model_dump_json()
+             event_data = {
+                 "event_type": event_type,
+                 "task_id": task.id,
+                 "user_id": task.user_id,
+                 "timestamp": datetime.now(timezone.utc).isoformat(),
+                 "data": json.loads(task.model_dump_json())
+             }
+             d.publish_event(
+                 pubsub_name=PUBSUB_NAME,
+                 topic_name=TOPIC_NAME,
+                 data=json.dumps(event_data),
+                 data_content_type="application/json"
+             )
+             print(f"Published event: {event_type} for task {task.id}")
+    except Exception as e:
+        print(f"Failed to publish event: {e}")
 
 @router.get("", response_model=List[Task])
 def list_tasks(
@@ -32,6 +69,10 @@ def create_task(
     session.add(db_task)
     session.commit()
     session.refresh(db_task)
+    
+    # Phase V: Publish Event
+    publish_task_event("created", db_task)
+    
     return db_task
 
 @router.get("/{task_id}", response_model=Task)
@@ -64,6 +105,10 @@ def update_task(
     session.add(db_task)
     session.commit()
     session.refresh(db_task)
+    
+    # Phase V: Publish Event
+    publish_task_event("updated", db_task)
+    
     return db_task
 
 @router.delete("/{task_id}")
@@ -78,4 +123,30 @@ def delete_task(
     
     session.delete(db_task)
     session.commit()
+    
+    # Phase V: Publish Event (Must invoke before commit? No, after is safer but object is detached. 
+    # Actually, deleted object might not serialize well if lazy loaded.
+    # We should serialize before delete or just send ID.
+    # Let's send a minimal event for delete or re-construct data.)
+    # Ideally we'd do it before delete commit, but let's just send ID and user_id.
+    try:
+         # Minimal event for deletion
+         if DAPR_AVAILABLE:
+            with DaprClient() as d:
+                event_data = {
+                    "event_type": "deleted",
+                    "task_id": task_id,
+                    "user_id": user_id,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "data": {} # No data for delete
+                }
+                d.publish_event(
+                    pubsub_name=PUBSUB_NAME,
+                    topic_name=TOPIC_NAME,
+                    data=json.dumps(event_data),
+                    data_content_type="application/json"
+                )
+    except Exception:
+        pass
+
     return {"ok": True}

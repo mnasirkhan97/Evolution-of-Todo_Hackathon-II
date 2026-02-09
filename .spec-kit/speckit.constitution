@@ -1,0 +1,15 @@
+# Constitution
+## Principles
+1. **Spec-First Development**: No code is written without a corresponding task in `speckit.tasks`, derived from `speckit.plan` and `speckit.specify`.
+2. **Event-Driven Architecture**: Use Kafka (via Dapr Pub/Sub) for inter-service communication where possible, especially for "Advanced" features like Reminders and Audit Logs.
+3. **Cloud-Native**: Design for Kubernetes deployment (Minikube first, then Cloud). Structure apps as containerized microservices or modular monoliths ready to split.
+4. **Statelessness**: Application services must remain stateless. State is delegated to Neon DB (Postgres) or Dapr State Store.
+5. **Security**: Secrets (API keys, DB credentials) must never be hardcoded. Use Environment Variables or Dapr Secret Stores.
+
+## Tech Stack Constraints
+- **Backend**: Python (FastAPI), SQLModel.
+- **Frontend**: TypeScript (Next.js 14), Tailwind CSS.
+- **Infrastructure**: Docker, Kubernetes (Minikube/Cloud), Helm.
+- **Middleware**: Dapr (Distributed Application Runtime).
+- **Messaging**: Kafka (Redpanda or Strimzi).
+- **AI**: OpenAI API (Agents SDK, MCP).

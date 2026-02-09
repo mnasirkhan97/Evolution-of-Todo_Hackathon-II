@@ -76,13 +76,26 @@ export const api = {
     const query = status ? `?status=${status}` : "";
     return fetchWithAuth(`/tasks${query}`);
   },
-  createTask: (data: { title: string; description?: string }) => {
+  createTask: (data: {
+    title: string;
+    description?: string;
+    is_recurring?: boolean;
+    recurrence_interval?: string;
+    due_date?: string;
+  }) => {
     return fetchWithAuth("/tasks", {
       method: "POST",
       body: JSON.stringify(data),
     });
   },
-  updateTask: (id: number, data: { title?: string; description?: string; status?: string }) => {
+  updateTask: (id: number, data: {
+    title?: string;
+    description?: string;
+    status?: string;
+    is_recurring?: boolean;
+    recurrence_interval?: string;
+    due_date?: string;
+  }) => {
     return fetchWithAuth(`/tasks/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
