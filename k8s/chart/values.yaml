@@ -1,0 +1,25 @@
+backend:
+  replicaCount: 1
+  image:
+    repository: todo-backend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8000
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: todo-frontend
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  service:
+    type: NodePort # Easier for Minikube access
+    port: 3000
+    nodePort: 30080
+
+env:
+  databaseUrl: "postgresql://user:pass@host:5432/db" # REPLACE THIS
+  openaiApiKey: "" # REPLACE THIS
+  betterAuthSecret: "dev-secret-key"
