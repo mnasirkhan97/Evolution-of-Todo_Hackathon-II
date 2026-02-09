@@ -98,5 +98,11 @@ export const api = {
       method: "PUT",
       body: JSON.stringify({ status: "completed" }),
     });
+  },
+  chat: async (userId: string, message: string, conversationId?: number) => {
+    return fetchWithAuth(`/${userId}/chat`, {
+      method: "POST",
+      body: JSON.stringify({ message, conversation_id: conversationId }),
+    });
   }
 };
