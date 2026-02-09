@@ -11,6 +11,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./backend_dev.db")
 engine = create_engine(DATABASE_URL, echo=True)
 
 def init_db():
+    from models import Task, Conversation, Message
     SQLModel.metadata.create_all(engine)
 
 def get_session() -> Generator[Session, None, None]:

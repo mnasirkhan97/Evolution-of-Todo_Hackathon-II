@@ -37,3 +37,27 @@ app.include_router(tasks.router)
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Evolution of Todo API (Phase II)"}
+
+# --- Phase III: Chat Endpoint ---
+from pydantic import BaseModel
+from typing import Optional, List
+from backend.ai.agent import run_agent
+
+class ChatRequest(BaseModel):
+    message: str
+    conversation_id: Optional[int] = None
+
+class ChatResponse(BaseModel):
+    conversation_id: int
+    response: str
+    tool_calls: List[str]
+
+@app.post("/api/{user_id}/chat", response_model=ChatResponse)
+async def chat_endpoint(user_id: str, request: ChatRequest):
+    """
+    Stateless chat endpoint.
+    Persists state to DB via run_agent.
+    """
+    result = run_agent(user_id, request.message, request.conversation_id)
+    return ChatResponse(**result)
+
